@@ -1,112 +1,139 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Linking, StyleSheet } from 'react-native';
 
-import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Collapsible } from '@/components/ui/collapsible';
 import { Fonts } from '@/constants/theme';
 
-export default function TabTwoScreen() {
+export default function PortfolioScreen() {
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+      headerBackgroundColor={{ light: '#0A0A0A', dark: '#000000' }}
       headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
+        <Image
+          source={require('@/assets/images/matalabs-logo.png')} // Add your logo here!
           style={styles.headerImage}
+          contentFit="contain"
         />
       }>
+      {/* Hero Title */}
       <ThemedView style={styles.titleContainer}>
         <ThemedText
           type="title"
           style={{
             fontFamily: Fonts.rounded,
+            fontSize: 42,
+            fontWeight: '900',
+            letterSpacing: -1,
           }}>
-          Explore
+          MataLabs
         </ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
+
+      <ThemedText style={styles.subtitle}>
+        Building the future with AI-powered mobile & web applications.
+      </ThemedText>
+
+      {/* About Section */}
+      <Collapsible title="About MataLabs" defaultOpen>
         <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
+          We are a cutting-edge software studio specializing in{' '}
+          <ThemedText type="defaultSemiBold">React Native</ThemedText>,{' '}
+          <ThemedText type="defaultSemiBold">AI integration</ThemedText>, and{' '}
+          <ThemedText type="defaultSemiBold">full-stack development</ThemedText>.
         </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
+        <ThemedText style={{ marginTop: 12 }}>
+          From voice-powered AI translators to real-time data apps, we deliver fast, beautiful,
+          and intelligent solutions that scale.
         </ThemedText>
       </Collapsible>
-      <Collapsible title="Images">
+
+      {/* Expertise */}
+      <Collapsible title="Our Expertise">
+        <ThemedText>• Cross-platform apps (iOS, Android, Web)</ThemedText>
+        <ThemedText>• AI & LLM integration (Groq, OpenAI, Llama)</ThemedText>
+        <ThemedText>• Real-time voice transcription & translation</ThemedText>
+        <ThemedText>• Modern UI/UX with animations & dark mode</ThemedText>
+        <ThemedText>• Expo & React Native at production scale</ThemedText>
+      </Collapsible>
+
+      {/* Featured Project */}
+      <Collapsible title="Featured Project: Voice Translator">
         <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
+          A real-time voice translation app powered by{' '}
+          <ThemedText type="defaultSemiBold">Groq + Whisper</ThemedText> and{' '}
+          <ThemedText type="defaultSemiBold">Llama 3.1</ThemedText>.
+        </ThemedText>
+        <ThemedText style={{ marginTop: 8 }}>
+          Speak in any language → instantly hear and read the translation.
         </ThemedText>
         <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
+          source={require('@/assets/images/voice-translator-preview.png')} // Optional: add screenshot
+          style={{ width: '100%', height: 200, borderRadius: 12, marginVertical: 16 }}
+          placeholder="L6PZf7?uoJ-_@.bRayjZ~qQ;IAxZ"
         />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
       </Collapsible>
-      <Collapsible title="Light and dark mode components">
+
+      {/* GitHub & Contact */}
+      <Collapsible title="Open Source & Contact">
         <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
+          We're strong believers in open collaboration and clean code.
         </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
+        <ExternalLink href="https://github.com/rodeok">
+          <ThemedText type="link" style={styles.githubLink}>
+            github.com/matalabs
+          </ThemedText>
         </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
+        <ThemedText style={{ marginTop: 12 }}>
+          Want to work together? Reach out at{' '}
+          <ThemedText
+            type="link"
+            onPress={() => Linking.openURL('mailto:hello@matalabs.dev')}>
+            hello@matalabs.dev
+          </ThemedText>
         </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
       </Collapsible>
+
+      {/* Final CTA */}
+      <ThemedView style={styles.footer}>
+        <ThemedText type="subtitle" style={{ textAlign: 'center', marginTop: 20 }}>
+          Let's build something amazing together.
+        </ThemedText>
+      </ThemedView>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
+    width: 380,
+    height: 380,
+    opacity: 0.15,
     position: 'absolute',
+    bottom: -80,
+    left: -50,
   },
   titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    opacity: 0.9,
+    marginBottom: 24,
+    paddingHorizontal: 20,
+    lineHeight: 26,
+  },
+  githubLink: {
+    fontSize: 18,
+    marginTop: 12,
+  },
+  footer: {
+    marginTop: 30,
+    paddingBottom: 40,
   },
 });
