@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const GROQ_API_URL = 'https://api.groq.com/openai/v1';
+const GROQ_API_URL = process.env.GROQ_API_URL
 const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || '';
 // Models
 const TRANSLATION_MODEL = 'openai/gpt-oss-120b';
