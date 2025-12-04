@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '../../context/TranslationContext';
-import { transcribeAudio, translateText } from '../../services/groq';
+import { generateSpeech, transcribeAudio, translateText } from '../../services/groq';
 
 export default function TranslatorScreen() {
   const router = useRouter();
@@ -109,11 +109,25 @@ export default function TranslatorScreen() {
     }
   };
 
+  const handlePlay = async (text: string) => {
+    if (!text || !text.trim()) return;
+
+    try {
+      const uri = await generateSpeech(text, apiKey);
+      const { sound } = await Audio.Sound.createAsync({ uri });
+      await sound.playAsync();
+    } catch (e) {
+      console.error('Playback error:', e);
+      Alert.alert('Error', 'Unable to play audio.');
+    }
+  };
+
   const swapLanguages = () => {
     const temp = sourceLang;
     setSourceLang(targetLang);
     setTargetLang(temp);
   };
+
 
   return (
     <View style={styles.container}>
@@ -144,6 +158,9 @@ export default function TranslatorScreen() {
           <View style={styles.card}>
             <Text style={styles.label}>{sourceLang}</Text>
             <Text style={styles.text}>{sourceText}</Text>
+            <TouchableOpacity style={styles.playButton} onPress={() => handlePlay(sourceText)} disabled={isProcessing}>
+              <Ionicons name="play-circle" size={24} color="#3b5998" />
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.placeholderContainer}>
@@ -162,6 +179,10 @@ export default function TranslatorScreen() {
           <View style={[styles.card, styles.translatedCard]}>
             <Text style={styles.label}>{targetLang}</Text>
             <Text style={[styles.text, styles.translatedText]}>{translatedText}</Text>
+            {/* Play button */}
+            <TouchableOpacity style={styles.playButton} onPress={() => handlePlay(translatedText)} disabled={isProcessing}>
+              <Ionicons name="play-circle" size={24} color="#fff" />
+            </TouchableOpacity>
           </View>
         ) : null}
       </ScrollView>
@@ -285,19 +306,25 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 10,
   },
-  recordButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+  playButton: {
+    marginTop: 10,
+    alignSelf: 'center',
     backgroundColor: '#3b5998',
-    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
+  },
+  recordButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#3b5998',
     justifyContent: 'center',
-    marginBottom: 10,
+    alignItems: 'center',
     shadowColor: '#3b5998',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 5,
   },
   recordingButton: {
     backgroundColor: '#ff3b30',

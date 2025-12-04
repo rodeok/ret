@@ -1,9 +1,35 @@
 import { Ionicons } from '@expo/vector-icons';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Audio } from 'expo-av';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { TranslationHistoryItem, useTranslation } from '../../context/TranslationContext';
+import { generateSpeech } from '../../services/groq';
 
 export default function HistoryScreen() {
-    const { history, clearHistory } = useTranslation();
+    const { history, clearHistory, apiKey } = useTranslation();
+    const [playingId, setPlayingId] = useState<string | null>(null);
+
+    const handlePlay = async (text: string, id: string) => {
+        if (playingId) return; // Prevent multiple playbacks
+
+        try {
+            setPlayingId(id);
+            const uri = await generateSpeech(text, apiKey);
+            const { sound } = await Audio.Sound.createAsync({ uri });
+            await sound.playAsync();
+
+            // Reset playing state when audio finishes (approximate, or use status update)
+            sound.setOnPlaybackStatusUpdate((status) => {
+                if (status.isLoaded && status.didJustFinish) {
+                    setPlayingId(null);
+                }
+            });
+        } catch (e) {
+            console.error('Playback error:', e);
+            Alert.alert('Error', 'Unable to play audio.');
+            setPlayingId(null);
+        }
+    };
 
     const renderItem = ({ item }: { item: TranslationHistoryItem }) => (
         <View style={styles.card}>
@@ -18,7 +44,21 @@ export default function HistoryScreen() {
 
             <Text style={styles.sourceText}>{item.sourceText}</Text>
             <View style={styles.divider} />
-            <Text style={styles.translatedText}>{item.translatedText}</Text>
+
+            <View style={styles.translationContainer}>
+                <Text style={styles.translatedText}>{item.translatedText}</Text>
+                <TouchableOpacity
+                    style={styles.playButton}
+                    onPress={() => handlePlay(item.translatedText, item.id)}
+                    disabled={playingId !== null}
+                >
+                    {playingId === item.id ? (
+                        <ActivityIndicator size="small" color="#3b5998" />
+                    ) : (
+                        <Ionicons name="play-circle" size={28} color="#3b5998" />
+                    )}
+                </TouchableOpacity>
+            </View>
         </View>
     );
 
@@ -118,10 +158,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         marginVertical: 8,
     },
+    translationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
     translatedText: {
         fontSize: 16,
         color: '#3b5998',
         fontWeight: '500',
+        flex: 1,
+        marginRight: 8,
+    },
+    playButton: {
+        padding: 4,
     },
     emptyContainer: {
         alignItems: 'center',

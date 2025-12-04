@@ -1,7 +1,8 @@
 import axios from 'axios';
+import * as FileSystem from 'expo-file-system/legacy';
 
-const GROQ_API_URL = process.env.GROQ_API_URL
-const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || '';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1';
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || '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';
 // Models
 const TRANSLATION_MODEL = 'openai/gpt-oss-120b';
 const TRANSCRIPTION_MODEL = 'whisper-large-v3-turbo';
@@ -91,6 +92,69 @@ export const translateText = async (
         return response.data.choices[0]?.message?.content?.trim() || '';
     } catch (error) {
         console.error('Translation Error:', error);
+        throw error;
+    }
+};
+
+export const generateSpeech = async (
+    text: string,
+    apiKey: string
+): Promise<string> => {
+    const keyToUse = apiKey || GROQ_API_KEY;
+    if (!keyToUse || keyToUse === 'YOUR_GROQ_API_KEY_HERE') {
+        throw new Error('Groq API Key is missing. Please set it in settings.');
+    }
+
+    try {
+        const response = await fetch(`${GROQ_API_URL}/audio/speech`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${keyToUse}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: 'playai-tts',
+                input: text,
+                voice: 'Celeste-PlayAI', // Default voice
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Speech generation failed');
+        }
+
+        // Get the audio data as a blob
+        const blob = await response.blob();
+
+        // Convert blob to base64
+        const reader = new FileReader();
+        return new Promise((resolve, reject) => {
+            reader.onloadend = async () => {
+                const result = reader.result;
+                if (typeof result !== 'string') {
+                    reject(new Error('Failed to convert audio blob to base64'));
+                    return;
+                }
+
+                const base64data = result.split(',')[1];
+                const fileUri = `${FileSystem.documentDirectory}speech_${Date.now()}.mp3`;
+
+                try {
+                    await FileSystem.writeAsStringAsync(fileUri, base64data, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
+                    resolve(fileUri);
+                } catch (e) {
+                    reject(e);
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+
+    } catch (error) {
+        console.error('Speech Generation Error:', error);
         throw error;
     }
 };
