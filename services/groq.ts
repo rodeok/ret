@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1';
-const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || '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';
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || '';
 // Models
 const TRANSLATION_MODEL = 'openai/gpt-oss-120b';
 const TRANSCRIPTION_MODEL = 'whisper-large-v3-turbo';
